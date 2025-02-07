@@ -1,0 +1,23 @@
+.ion-color-medium {
+    --ion-color-base: var(--ion-color-medium-shade);
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+}
+
+h3 {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.ion-margin-vertical {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
