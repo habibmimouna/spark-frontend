@@ -19,7 +19,7 @@ const PatientCard: React.FC<PatientCardProps> = ({ patient, onClick }) => {
 
     const headerStyle = {
         display: 'flex',
-        justifyContent: 'space-between',
+        
         alignItems: 'center',
         marginBottom: '16px',
         paddingBottom: '12px',
@@ -70,7 +70,8 @@ const PatientCard: React.FC<PatientCardProps> = ({ patient, onClick }) => {
                         fontSize: '0.9rem',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '4px'
+                        gap: '4px',
+                        marginLeft:'10px',
                     }}>
                         <IonIcon icon={person} />
                         {patient.gender}
