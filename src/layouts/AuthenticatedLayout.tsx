@@ -1,4 +1,3 @@
-// src/layouts/AuthenticatedLayout.tsx
 import React from 'react';
 import { IonContent, IonPage, IonSplitPane } from '@ionic/react';
 import DoctorMenu from '../components/DoctorMenu';

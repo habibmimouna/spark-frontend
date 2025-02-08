@@ -41,71 +41,69 @@ const App: React.FC = () => (
       <IonRouterOutlet>
         <Route exact path="/login" component={LoginPage} />
         <Route exact path="/reset-password" component={ResetPassword} />
-        
-        {/* Doctor Routes */}
-        <ProtectedRoute 
-          exact 
-          path="/doctor/dashboard" 
+
+        <ProtectedRoute
+          exact
+          path="/doctor/dashboard"
           userType="doctor"
           component={(props: any) => (
             <AuthenticatedLayout>
               <DoctorDashboard {...props} />
             </AuthenticatedLayout>
-          )} 
+          )}
         />
-        <ProtectedRoute 
-          exact 
-          path="/doctor/appointments" 
+        <ProtectedRoute
+          exact
+          path="/doctor/appointments"
           userType="doctor"
           component={(props: any) => (
             <AuthenticatedLayout>
               <DoctorAppointments {...props} />
             </AuthenticatedLayout>
-          )} 
+          )}
         />
-        <ProtectedRoute 
-          exact 
-          path="/doctor/patients" 
+        <ProtectedRoute
+          exact
+          path="/doctor/patients"
           userType="doctor"
           component={(props: any) => (
             <AuthenticatedLayout>
               <DoctorPatients {...props} />
             </AuthenticatedLayout>
-          )} 
+          )}
         />
-        
-        {/* Patient Routes */}
-        <ProtectedRoute 
-          exact 
-          path="/patient/dashboard" 
+
+        <ProtectedRoute
+          exact
+          path="/patient/dashboard"
           userType="patient"
           component={(props: any) => (
             <AuthenticatedLayout>
               <PatientDashboard {...props} />
             </AuthenticatedLayout>
-          )} 
+          )}
         />
-        <ProtectedRoute 
-          exact 
-          path="/patient/appointments" 
+        <ProtectedRoute
+          exact
+          path="/patient/appointments"
           userType="patient"
           component={(props: any) => (
             <AuthenticatedLayout>
               <PatientAppointments {...props} />
             </AuthenticatedLayout>
-          )} 
+          )}
         />
-        <ProtectedRoute 
-          exact 
-          path="/patient/profile" 
+        <ProtectedRoute
+          exact
+          path="/patient/profile"
           userType="patient"
           component={(props: any) => (
             <AuthenticatedLayout>
               <PatientProfile {...props} />
             </AuthenticatedLayout>
-          )} 
+          )}
         />
-        
+
         <Route exact path="/">
           <Redirect to="/login" />
         </Route>

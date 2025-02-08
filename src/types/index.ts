@@ -1,6 +1,3 @@
-// src/types/index.ts
-
-// User (Doctor) types
 export interface User {
     id: string;
     email: string;
@@ -36,13 +33,13 @@ export interface LoginResponse {
     };
 }
 
-// Patient types
 export interface Patient {
+    _id: string;
     id: string;
     firstName: string;
     lastName: string;
     email: string;
-    password:string;
+    password: string;
     dateOfBirth: string;
     gender: string;
     phoneNumber: string;
@@ -65,7 +62,6 @@ export interface PatientResponse {
     };
 }
 
-// Common response types
 export interface MessageResponse {
     message: string;
 }
@@ -75,7 +71,6 @@ export interface PatientCreationResponse {
     patient: Patient;
 }
 
-// API Error type
 export interface ApiError {
     message: string;
     status?: number;

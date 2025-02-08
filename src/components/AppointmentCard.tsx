@@ -1,4 +1,3 @@
-// src/components/AppointmentCard.tsx
 import React from 'react';
 import {
     IonCard,

@@ -1,6 +1,3 @@
-/* src/theme/global.css */
-
-/* Custom Variables */
 :root {
     --ion-color-primary: #3880ff;
     --ion-color-secondary: #3dc2ff;
@@ -8,7 +5,7 @@
     --ion-font-family: 'Roboto', sans-serif;
 }
 
-/* General Styles */
+
 .error-message {
     color: var(--ion-color-danger);
     padding: 5px 15px;
@@ -21,7 +18,6 @@
     right: 10px;
 }
 
-/* Card Styles */
 ion-card {
     margin: 10px;
     border-radius: 10px;
@@ -32,7 +28,6 @@ ion-card-content {
     padding: 16px;
 }
 
-/* Form Styles */
 ion-item {
     --padding-start: 0;
     --inner-padding-end: 0;
@@ -46,13 +41,12 @@ ion-textarea {
     margin-top: 4px;
 }
 
-/* Button Styles */
+
 ion-button {
     --border-radius: 8px;
     margin: 10px 0;
 }
 
-/* Menu Styles */
 ion-menu ion-content {
     --background: var(--ion-color-light);
 }
@@ -62,13 +56,13 @@ ion-menu ion-item {
     --min-height: 50px;
 }
 
-/* Modal Styles */
+
 ion-modal ion-content {
     --padding-top: 16px;
     --padding-bottom: 16px;
 }
 
-/* Toast Styles */
+
 ion-toast {
     --border-radius: 8px;
     --background: var(--ion-color-dark);

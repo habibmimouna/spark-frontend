@@ -1,4 +1,3 @@
-// src/services/api.ts
 import axios from 'axios';
 
 const API_URL = 'http://localhost:3000/api';
@@ -10,7 +9,6 @@ const api = axios.create({
   },
 });
 
-// Request interceptor for API calls
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -24,7 +22,6 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor for API calls
 api.interceptors.response.use(
   (response) => response,
   async (error) => {

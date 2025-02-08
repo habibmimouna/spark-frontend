@@ -1,4 +1,3 @@
-// src/components/PatientMenu.tsx
 import React from 'react';
 import {
   IonMenu,

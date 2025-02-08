@@ -1,4 +1,3 @@
-// src/pages/doctor/Patients.tsx
 import React, { useState, useEffect } from 'react';
 import {
     IonContent,
@@ -6,11 +5,8 @@ import {
     IonPage,
     IonTitle,
     IonToolbar,
-    IonList,
     IonItem,
     IonLabel,
-    IonCard,
-    IonCardContent,
     IonButton,
     IonIcon,
     IonModal,
@@ -33,17 +29,8 @@ import moment from 'moment';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { User } from '../../types/index'
+import PatientCard from '../../components/PatientCard';
 
-
-// interface User {
-//     id: string;
-//     email: string;
-//     firstName: string;
-//     lastName: string;
-//     phoneNumber: string;
-//     state: string;
-//     medicalSpecialty: string;
-// }
 
 const DoctorPatients: React.FC = () => {
     const [patients, setPatients] = useState<Patient[]>([]);
@@ -62,9 +49,7 @@ const DoctorPatients: React.FC = () => {
         if (userString) {
             const userObject = JSON.parse(userString);
 
-            console.log(userObject);
             setDoctor(userObject)
-            console.log("ddd", doctor?.id);
 
         } else {
             console.log('No user data found in localStorage');
@@ -101,7 +86,6 @@ const DoctorPatients: React.FC = () => {
         validationSchema,
         onSubmit: async (values) => {
             try {
-                console.log("vvv", values, doctor);
 
                 await api.post('/patient', { ...values, assignedDoctor: doctor?.id });
                 setToastMessage('Patient created successfully');
@@ -180,32 +164,76 @@ const DoctorPatients: React.FC = () => {
             </IonHeader>
 
             <IonContent className="ion-padding">
+                <div style={{
+                    maxWidth: '1200px',
+                    margin: '0 auto',
+                    padding: '16px'
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '20px'
+                    }}>
+                        <IonInput
+                            placeholder="Search patients..."
+                            value={searchText}
+                            onIonChange={e => setSearchText(e.detail.value!)}
+                            style={{
+                                '--background': '#f4f5f8',
+                                '--padding-start': '16px',
+                                '--padding-end': '16px',
+                                '--border-radius': '8px',
+                            }}
+                        />
+                        <IonSelect
+                            value={sortBy}
+                            onIonChange={e => setSortBy(e.detail.value)}
+                            interface="popover"
+                            style={{
+                                minWidth: '120px',
+                            }}
+                        >
+                            <IonSelectOption value="name">Sort by Name</IonSelectOption>
+                            <IonSelectOption value="recent">Sort by Recent</IonSelectOption>
+                        </IonSelect>
+                    </div>
 
-                <IonList>
-                    {filteredPatients.map(patient => (
-                        <IonCard key={patient.id} onClick={() => handlePatientClick(patient)}>
-                            <IonCardContent>
-                                <div className="ion-justify-content-between ion-align-items-center">
-                                    <h2 className="ion-no-margin">
-                                        {patient.firstName} {patient.lastName}
-                                    </h2>
-                                    <p className="ion-no-margin">
-                                        <IonIcon icon={person} /> {patient.gender}
-                                    </p>
-                                    <p className="ion-no-margin">
-                                        <IonIcon icon={time} /> {moment(patient.dateOfBirth).format('MMMM D, YYYY')}
-                                    </p>
-                                    <p className="ion-no-margin">
-                                        <IonIcon icon={call} /> {patient.phoneNumber}
-                                    </p>
-                                    <p className="ion-no-margin">
-                                        <IonIcon icon={mail} /> {patient.email}
-                                    </p>
-                                </div>
-                            </IonCardContent>
-                        </IonCard>
-                    ))}
-                </IonList>
+                    {filteredPatients.length === 0 ? (
+                        <div style={{
+                            textAlign: 'center',
+                            padding: '40px',
+                            color: '#666',
+                            backgroundColor: '#f4f5f8',
+                            borderRadius: '12px',
+                            margin: '20px 0'
+                        }}>
+                            <IonIcon
+                                icon={person}
+                                style={{
+                                    fontSize: '48px',
+                                    color: '#999',
+                                    marginBottom: '16px'
+                                }}
+                            />
+                            <p style={{ margin: '0' }}>No patients found</p>
+                        </div>
+                    ) : (
+                        <div style={{
+                            display: 'grid',
+                            gap: '16px',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))'
+                        }}>
+                            {filteredPatients.map(patient => (
+                                <PatientCard
+                                    key={patient._id}
+                                    patient={patient}
+                                    onClick={() => handlePatientClick(patient)}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
 
 
                 <IonFab vertical="bottom" horizontal="end" slot="fixed">
@@ -227,7 +255,7 @@ const DoctorPatients: React.FC = () => {
                     <IonContent className="ion-padding">
                         <form onSubmit={createPatientForm.handleSubmit}>
                             <IonItem>
-                                <IonLabel position="floating">First Name</IonLabel>
+                                <IonLabel position="stacked">First Name</IonLabel>
                                 <IonInput
                                     name="firstName"
                                     value={createPatientForm.values.firstName}
@@ -239,7 +267,7 @@ const DoctorPatients: React.FC = () => {
                             )}
 
                             <IonItem>
-                                <IonLabel position="floating">Last Name</IonLabel>
+                                <IonLabel position="stacked">Last Name</IonLabel>
                                 <IonInput
                                     name="lastName"
                                     value={createPatientForm.values.lastName}
@@ -251,7 +279,7 @@ const DoctorPatients: React.FC = () => {
                             )}
 
                             <IonItem>
-                                <IonLabel position="floating">Email</IonLabel>
+                                <IonLabel position="stacked">Email</IonLabel>
                                 <IonInput
                                     type="email"
                                     name="email"
@@ -264,7 +292,7 @@ const DoctorPatients: React.FC = () => {
                             )}
 
                             <IonItem>
-                                <IonLabel position="floating">Date of Birth</IonLabel>
+                                <IonLabel position="stacked">Date of Birth</IonLabel>
                                 <IonDatetime
                                     name="dateOfBirth"
                                     value={createPatientForm.values.dateOfBirth}
@@ -274,7 +302,7 @@ const DoctorPatients: React.FC = () => {
                             </IonItem>
 
                             <IonItem>
-                                <IonLabel position="floating">Gender</IonLabel>
+                                <IonLabel position="stacked">Gender</IonLabel>
                                 <IonSelect
                                     name="gender"
                                     value={createPatientForm.values.gender}
@@ -287,7 +315,7 @@ const DoctorPatients: React.FC = () => {
                             </IonItem>
 
                             <IonItem>
-                                <IonLabel position="floating">Phone Number</IonLabel>
+                                <IonLabel position="stacked">Phone Number</IonLabel>
                                 <IonInput
                                     type="tel"
                                     name="phoneNumber"
@@ -297,7 +325,7 @@ const DoctorPatients: React.FC = () => {
                             </IonItem>
 
                             <IonItem>
-                                <IonLabel position="floating">Address</IonLabel>
+                                <IonLabel position="stacked">Address</IonLabel>
                                 <IonTextarea
                                     name="address"
                                     value={createPatientForm.values.address}
@@ -306,7 +334,7 @@ const DoctorPatients: React.FC = () => {
                             </IonItem>
 
                             <IonItem>
-                                <IonLabel position="floating">Medical History</IonLabel>
+                                <IonLabel position="stacked">Medical History</IonLabel>
                                 <IonTextarea
                                     name="medicalHistory"
                                     value={createPatientForm.values.medicalHistory}

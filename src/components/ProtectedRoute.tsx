@@ -1,4 +1,3 @@
-// src/components/ProtectedRoute.tsx
 import React from 'react';
 import { Route, Redirect, RouteProps } from 'react-router-dom';
 import AuthService from '../services/auth.service';
@@ -21,9 +20,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     <Route
       {...rest}
       render={props => {
-        // Check if user is authenticated
+
         if (!isAuthenticated) {
-          // Redirect to login with return url
+
           return (
             <Redirect
               to={{
@@ -34,9 +33,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           );
         }
 
-        // Check if user has the correct type
+
         if (userType !== currentUserType) {
-          // Redirect to appropriate dashboard
+
           return (
             <Redirect
               to={{
@@ -47,9 +46,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           );
         }
 
-        // Check if user data exists
+
         if (!user) {
-          // Force logout if user data is missing
+
           AuthService.logout();
           return (
             <Redirect
@@ -60,8 +59,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
             />
           );
         }
-
-        // Render protected component
         return <Component {...props} />;
       }}
     />
