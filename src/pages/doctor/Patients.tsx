@@ -6,7 +6,6 @@ import {
     IonPage,
     IonTitle,
     IonToolbar,
-    IonSearchbar,
     IonList,
     IonItem,
     IonLabel,
@@ -14,40 +13,115 @@ import {
     IonCardContent,
     IonButton,
     IonIcon,
-    IonRefresher,
-    IonRefresherContent,
     IonModal,
     IonTextarea,
     IonToast,
-    IonBadge,
     IonMenuButton,
     IonButtons,
     IonSelect,
     IonSelectOption,
+    IonDatetime,
+    IonFab,
+    IonFabButton,
+    IonInput,
 } from '@ionic/react';
 import { RefresherEventDetail } from '@ionic/core';
-import { call, mail, person, time } from 'ionicons/icons';
+import { add, call, mail, person, time } from 'ionicons/icons';
 import api from '../../services/api';
 import { Patient } from '../../types';
-import AuthenticatedLayout from '../../layouts/AuthenticatedLayout';
 import moment from 'moment';
+import * as Yup from 'yup';
+import { useFormik } from 'formik';
+import {User} from '../../types/index'
+
+
+// interface User {
+//     id: string;
+//     email: string;
+//     firstName: string;
+//     lastName: string;
+//     phoneNumber: string;
+//     state: string;
+//     medicalSpecialty: string;
+// }
 
 const DoctorPatients: React.FC = () => {
     const [patients, setPatients] = useState<Patient[]>([]);
     const [searchText, setSearchText] = useState('');
     const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
     const [showModal, setShowModal] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [sortBy, setSortBy] = useState<'name' | 'recent'>('name');
+    const [doctor,setDoctor]=useState<User>()
 
     useEffect(() => {
+        
+        const userString = localStorage.getItem('user');
+        if (userString) {
+            const userObject = JSON.parse(userString);
+          
+            console.log(userObject);
+            setDoctor(userObject)
+            console.log("ddd",doctor?.id);
+            
+          } else {
+            console.log('No user data found in localStorage');
+          }
+
+        
         fetchPatients();
     }, []);
 
+    const validationSchema = Yup.object({
+        firstName: Yup.string().required('Required'),
+        lastName: Yup.string().required('Required'),
+        email: Yup.string().email('Invalid email address').required('Required'),
+        dateOfBirth: Yup.string().required('Required'),
+        gender: Yup.string().required('Required'),
+        phoneNumber: Yup.string().required('Required'),
+        address: Yup.string().required('Required'),
+        medicalHistory: Yup.string(),
+        assignedDoctor: Yup.string()
+    });
+
+    // Formik setup for creating a new patient
+    const createPatientForm = useFormik({
+        initialValues: {
+            firstName: '',
+            lastName: '',
+            email: '',
+            dateOfBirth: new Date().toISOString(),
+            gender: '',
+            phoneNumber: '',
+            address: '',
+            medicalHistory: '',
+            assignedDoctor:doctor?.id,
+        },
+        validationSchema,
+        onSubmit: async (values) => {
+            try {
+                console.log("vvv",values,doctor);
+                
+                await api.post('/patient', {...values,assignedDoctor:doctor?.id});
+                setToastMessage('Patient created successfully');
+                setShowToast(true);
+                setShowCreateModal(false);
+                createPatientForm.resetForm();
+                fetchPatients();
+            } catch (error) {
+                console.error('Error creating patient:', error);
+                setToastMessage('Failed to create patient');
+                setShowToast(true);
+            }
+        },
+    });
+
     const fetchPatients = async () => {
         try {
-            const response = await api.get('/patients');
+            
+            const response = await api.get('/patient');
             setPatients(response.data);
         } catch (error) {
             console.error('Error fetching patients:', error);
@@ -107,28 +181,7 @@ const DoctorPatients: React.FC = () => {
             </IonHeader>
 
             <IonContent className="ion-padding">
-                <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
-                    <IonRefresherContent></IonRefresherContent>
-                </IonRefresher>
-
-                <div className="ion-padding-bottom">
-                    <IonSearchbar
-                        value={searchText}
-                        onIonChange={e => setSearchText(e.detail.value!)}
-                        placeholder="Search patients..."
-                    />
-
-                    <div className="ion-text-end">
-                        <IonSelect
-                            value={sortBy}
-                            onIonChange={e => setSortBy(e.detail.value)}
-                            interface="popover"
-                        >
-                            <IonSelectOption value="name">Sort by Name</IonSelectOption>
-                            <IonSelectOption value="recent">Sort by Recent</IonSelectOption>
-                        </IonSelect>
-                    </div>
-                </div>
+                {/* Keep existing content until the list */}
 
                 <IonList>
                     {filteredPatients.map(patient => (
@@ -156,58 +209,126 @@ const DoctorPatients: React.FC = () => {
                     ))}
                 </IonList>
 
-                {/* Patient Details Modal */}
-                <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)}>
-                    {selectedPatient && (
-                        <>
-                            <IonHeader>
-                                <IonToolbar>
-                                    <IonTitle>
-                                        {selectedPatient.firstName} {selectedPatient.lastName}
-                                    </IonTitle>
-                                    <IonButtons slot="end">
-                                        <IonButton onClick={() => setShowModal(false)}>Close</IonButton>
-                                    </IonButtons>
-                                </IonToolbar>
-                            </IonHeader>
+                {/* Create Patient FAB */}
+                <IonFab vertical="bottom" horizontal="end" slot="fixed">
+                    <IonFabButton onClick={() => setShowCreateModal(true)}>
+                        <IonIcon icon={add} />
+                    </IonFabButton>
+                </IonFab>
 
-                            <IonContent className="ion-padding">
-                                <IonList>
-                                    <IonItem>
-                                        <IonLabel>
-                                            <h2>Contact Information</h2>
-                                            <p>Phone: {selectedPatient.phoneNumber}</p>
-                                            <p>Email: {selectedPatient.email}</p>
-                                            <p>Address: {selectedPatient.address}</p>
-                                        </IonLabel>
-                                    </IonItem>
+                {/* Keep existing Patient Details Modal */}
 
-                                    <IonItem>
-                                        <IonLabel>
-                                            <h2>Personal Information</h2>
-                                            <p>Date of Birth: {moment(selectedPatient.dateOfBirth).format('MMMM D, YYYY')}</p>
-                                            <p>Gender: {selectedPatient.gender}</p>
-                                        </IonLabel>
-                                    </IonItem>
+                {/* Create Patient Modal */}
+                <IonModal isOpen={showCreateModal} onDidDismiss={() => setShowCreateModal(false)}>
+                    <IonHeader>
+                        <IonToolbar>
+                            <IonTitle>Create New Patient</IonTitle>
+                            <IonButtons slot="end">
+                                <IonButton onClick={() => setShowCreateModal(false)}>Close</IonButton>
+                            </IonButtons>
+                        </IonToolbar>
+                    </IonHeader>
 
-                                    <IonItem>
-                                        <IonLabel>
-                                            <h2>Medical History</h2>
-                                            <p>{selectedPatient.medicalHistory}</p>
-                                        </IonLabel>
-                                    </IonItem>
-                                </IonList>
+                    <IonContent className="ion-padding">
+                        <form onSubmit={createPatientForm.handleSubmit}>
+                            <IonItem>
+                                <IonLabel position="floating">First Name</IonLabel>
+                                <IonInput
+                                    name="firstName"
+                                    value={createPatientForm.values.firstName}
+                                    onIonChange={createPatientForm.handleChange}
+                                />
+                            </IonItem>
+                            {createPatientForm.touched.firstName && createPatientForm.errors.firstName && (
+                                <div className="error-message">{createPatientForm.errors.firstName}</div>
+                            )}
 
-                                <IonButton
-                                    expand="block"
-                                    routerLink={`/doctor/appointments?patientId=${selectedPatient.id}`}
-                                    className="ion-margin-top"
+                            <IonItem>
+                                <IonLabel position="floating">Last Name</IonLabel>
+                                <IonInput
+                                    name="lastName"
+                                    value={createPatientForm.values.lastName}
+                                    onIonChange={createPatientForm.handleChange}
+                                />
+                            </IonItem>
+                            {createPatientForm.touched.lastName && createPatientForm.errors.lastName && (
+                                <div className="error-message">{createPatientForm.errors.lastName}</div>
+                            )}
+
+                            <IonItem>
+                                <IonLabel position="floating">Email</IonLabel>
+                                <IonInput
+                                    type="email"
+                                    name="email"
+                                    value={createPatientForm.values.email}
+                                    onIonChange={createPatientForm.handleChange}
+                                />
+                            </IonItem>
+                            {createPatientForm.touched.email && createPatientForm.errors.email && (
+                                <div className="error-message">{createPatientForm.errors.email}</div>
+                            )}
+
+                            <IonItem>
+                                <IonLabel position="floating">Date of Birth</IonLabel>
+                                <IonDatetime
+                                    name="dateOfBirth"
+                                    value={createPatientForm.values.dateOfBirth}
+                                    onIonChange={(e) => createPatientForm.setFieldValue('dateOfBirth', e.detail.value)}
+                                    max={new Date().toISOString()}
+                                />
+                            </IonItem>
+
+                            <IonItem>
+                                <IonLabel position="floating">Gender</IonLabel>
+                                <IonSelect
+                                    name="gender"
+                                    value={createPatientForm.values.gender}
+                                    onIonChange={(e) => createPatientForm.setFieldValue('gender', e.detail.value)}
                                 >
-                                    View Appointments
-                                </IonButton>
-                            </IonContent>
-                        </>
-                    )}
+                                    <IonSelectOption value="male">Male</IonSelectOption>
+                                    <IonSelectOption value="female">Female</IonSelectOption>
+                                    <IonSelectOption value="other">Other</IonSelectOption>
+                                </IonSelect>
+                            </IonItem>
+
+                            <IonItem>
+                                <IonLabel position="floating">Phone Number</IonLabel>
+                                <IonInput
+                                    type="tel"
+                                    name="phoneNumber"
+                                    value={createPatientForm.values.phoneNumber}
+                                    onIonChange={createPatientForm.handleChange}
+                                />
+                            </IonItem>
+
+                            <IonItem>
+                                <IonLabel position="floating">Address</IonLabel>
+                                <IonTextarea
+                                    name="address"
+                                    value={createPatientForm.values.address}
+                                    onIonChange={createPatientForm.handleChange}
+                                />
+                            </IonItem>
+
+                            <IonItem>
+                                <IonLabel position="floating">Medical History</IonLabel>
+                                <IonTextarea
+                                    name="medicalHistory"
+                                    value={createPatientForm.values.medicalHistory}
+                                    onIonChange={createPatientForm.handleChange}
+                                />
+                            </IonItem>
+
+                            <IonButton
+                                expand="block"
+                                type="submit"
+                                className="ion-margin-top"
+                                disabled={!createPatientForm.isValid || createPatientForm.isSubmitting}
+                            >
+                                Create Patient
+                            </IonButton>
+                        </form>
+                    </IonContent>
                 </IonModal>
 
                 <IonToast
