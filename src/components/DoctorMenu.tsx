@@ -18,16 +18,19 @@ import {
   people,
   logOut,
 } from 'ionicons/icons';
-import { useHistory } from 'react-router-dom';
+import { Router, useHistory, useLocation } from 'react-router-dom';
 import AuthService from '../services/auth.service';
 
 const DoctorMenu: React.FC = () => {
   const history = useHistory();
+  const location = useLocation();
   const user = AuthService.getCurrentUser();
 
-  const handleLogout = () => {
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
     AuthService.logout();
-    history.push('/login');
+    window.location.href = '/login';
+  
   };
 
   return (
@@ -46,6 +49,7 @@ const DoctorMenu: React.FC = () => {
               routerLink="/doctor/dashboard" 
               routerDirection="root"
               lines="none"
+              color={location.pathname === '/doctor/dashboard' ? 'primary' : ''}
             >
               <IonIcon slot="start" icon={home} />
               <IonLabel>Dashboard</IonLabel>
@@ -56,6 +60,7 @@ const DoctorMenu: React.FC = () => {
               routerLink="/doctor/appointments" 
               routerDirection="root"
               lines="none"
+              color={location.pathname === '/doctor/appointments' ? 'primary' : ''}
             >
               <IonIcon slot="start" icon={calendar} />
               <IonLabel>Appointments</IonLabel>
@@ -66,6 +71,7 @@ const DoctorMenu: React.FC = () => {
               routerLink="/doctor/patients" 
               routerDirection="root"
               lines="none"
+              color={location.pathname === '/doctor/patients' ? 'primary' : ''}
             >
               <IonIcon slot="start" icon={people} />
               <IonLabel>Patients</IonLabel>
@@ -78,6 +84,9 @@ const DoctorMenu: React.FC = () => {
             expand="block" 
             onClick={handleLogout}
             color="danger"
+            style={{
+              marginTop: 'auto'
+            }}
           >
             <IonIcon slot="start" icon={logOut} />
             Logout

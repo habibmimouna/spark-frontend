@@ -38,16 +38,12 @@ const RegisterPage: React.FC = () => {
         state,
         medicalSpecialty
       });
-      
-      // Handle successful registration response
+
       console.log(response.data);
-      // Optionally store the JWT in localStorage or sessionStorage
       localStorage.setItem('token', response.data.token);
 
-      // Redirect to login page after successful registration
       history.push('/login');
     } catch (error: any) {
-      // Handle error response from server
       setErrorMessage(error.response?.data?.message || 'Something went wrong!');
     }
   };
@@ -138,7 +134,6 @@ const RegisterPage: React.FC = () => {
               </IonButton>
             </form>
 
-            {/* Link to Login Page */}
             <IonText className="ion-text-center ion-margin-top">
               <p>
                 Already have an account?{' '}

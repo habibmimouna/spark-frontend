@@ -1,4 +1,3 @@
-// src/services/auth.service.ts
 import api from './api';
 
 export interface LoginCredentials {
@@ -46,9 +45,7 @@ const AuthService = {
   },
 
   logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('userType');
+    localStorage.clear();
   },
 
   getCurrentUser: () => {

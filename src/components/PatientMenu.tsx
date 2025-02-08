@@ -42,12 +42,12 @@ const PatientMenu: React.FC = () => {
         <div className="ion-padding">
           <h2>Welcome, {user?.firstName}</h2>
         </div>
-        
+
         <IonList>
           <IonMenuToggle autoHide={false}>
-            <IonItem 
-              button 
-              routerLink="/patient/dashboard" 
+            <IonItem
+              button
+              routerLink="/patient/dashboard"
               routerDirection="root"
               lines="none"
             >
@@ -55,9 +55,9 @@ const PatientMenu: React.FC = () => {
               <IonLabel>Dashboard</IonLabel>
             </IonItem>
 
-            <IonItem 
-              button 
-              routerLink="/patient/appointments" 
+            <IonItem
+              button
+              routerLink="/patient/appointments"
               routerDirection="root"
               lines="none"
             >
@@ -65,9 +65,9 @@ const PatientMenu: React.FC = () => {
               <IonLabel>Appointments</IonLabel>
             </IonItem>
 
-            <IonItem 
-              button 
-              routerLink="/patient/profile" 
+            <IonItem
+              button
+              routerLink="/patient/profile"
               routerDirection="root"
               lines="none"
             >
@@ -78,8 +78,8 @@ const PatientMenu: React.FC = () => {
         </IonList>
 
         <div className="ion-padding">
-          <IonButton 
-            expand="block" 
+          <IonButton
+            expand="block"
             onClick={handleLogout}
             color="danger"
           >
