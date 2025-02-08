@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import {
   IonContent,
   IonHeader,
@@ -14,139 +13,194 @@ import {
   IonText,
   IonCard,
   IonCardContent,
+  IonToast,
 } from '@ionic/react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
-const RegisterPage: React.FC = () => {
-  const history = useHistory();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [state, setState] = useState('');
-  const [medicalSpecialty, setMedicalSpecialty] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string>('');
+const DoctorRegisterPage: React.FC = () => {
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastColor, setToastColor] = useState<'success' | 'danger'>('success');
 
-  const handleRegister = async () => {
-    try {
-      const response = await axios.post('http://localhost:5000/api/auth/signup', {
-        email,
-        password,
-        firstName,
-        lastName,
-        phoneNumber,
-        state,
-        medicalSpecialty
-      });
+  const validationSchema = Yup.object({
+    firstName: Yup.string().required('Required'),
+    lastName: Yup.string().required('Required'),
+    email: Yup.string().email('Invalid email address').required('Required'),
+    password: Yup.string()
+      .min(6, 'Password must be at least 6 characters')
+      .required('Required'),
+    phoneNumber: Yup.string().required('Required'),
+    state: Yup.string().required('Required'),
+    medicalSpecialty: Yup.string().required('Required'),
+  });
 
-      console.log(response.data);
-      localStorage.setItem('token', response.data.token);
+  const formik = useFormik({
+    initialValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      phoneNumber: '',
+      state: '',
+      medicalSpecialty: ''
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      try {
+        const response = await axios.post(
+          'http://localhost:3000/api/auth/signup',
+          values
+        );
 
-      history.push('/login');
-    } catch (error: any) {
-      setErrorMessage(error.response?.data?.message || 'Something went wrong!');
-    }
-  };
+        if (response.data.token) {
+          setToastColor('success');
+          setToastMessage('Registration successful! Redirecting to login...');
+          setShowToast(true);
+          
+          // Wait for toast to be visible before redirecting
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+        }
+      } catch (error: any) {
+        setToastColor('danger');
+        setToastMessage(error.response?.data?.message || 'Registration failed');
+        setShowToast(true);
+      }
+    },
+  });
 
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Register</IonTitle>
+          <IonTitle>Doctor Registration</IonTitle>
         </IonToolbar>
       </IonHeader>
 
       <IonContent className="ion-padding">
         <IonCard>
           <IonCardContent>
-            <form>
+            <form onSubmit={formik.handleSubmit}>
               <IonItem>
-                <IonLabel position="floating">First Name</IonLabel>
+                <IonLabel position="stacked">First Name</IonLabel>
                 <IonInput
-                  type="text"
-                  value={firstName}
-                  onIonChange={(e) => setFirstName(e.detail.value!)}
+                  name="firstName"
+                  value={formik.values.firstName}
+                  onIonChange={formik.handleChange}
                 />
               </IonItem>
-
-              <IonItem>
-                <IonLabel position="floating">Last Name</IonLabel>
-                <IonInput
-                  type="text"
-                  value={lastName}
-                  onIonChange={(e) => setLastName(e.detail.value!)}
-                />
-              </IonItem>
-
-              <IonItem>
-                <IonLabel position="floating">Phone Number</IonLabel>
-                <IonInput
-                  type="text"
-                  value={phoneNumber}
-                  onIonChange={(e) => setPhoneNumber(e.detail.value!)}
-                />
-              </IonItem>
-
-              <IonItem>
-                <IonLabel position="floating">State</IonLabel>
-                <IonInput
-                  type="text"
-                  value={state}
-                  onIonChange={(e) => setState(e.detail.value!)}
-                />
-              </IonItem>
-
-              <IonItem>
-                <IonLabel position="floating">Medical Specialty</IonLabel>
-                <IonInput
-                  type="text"
-                  value={medicalSpecialty}
-                  onIonChange={(e) => setMedicalSpecialty(e.detail.value!)}
-                />
-              </IonItem>
-
-              <IonItem>
-                <IonLabel position="floating">Email</IonLabel>
-                <IonInput
-                  type="email"
-                  value={email}
-                  onIonChange={(e) => setEmail(e.detail.value!)}
-                />
-              </IonItem>
-
-              <IonItem>
-                <IonLabel position="floating">Password</IonLabel>
-                <IonInput
-                  type="password"
-                  value={password}
-                  onIonChange={(e) => setPassword(e.detail.value!)}
-                />
-              </IonItem>
-
-              {errorMessage && (
-                <IonText color="danger">
-                  <p>{errorMessage}</p>
-                </IonText>
+              {formik.touched.firstName && formik.errors.firstName && (
+                <div className="error-message">{formik.errors.firstName}</div>
               )}
 
-              <IonButton expand="block" className="ion-margin-top" onClick={handleRegister}>
+              <IonItem>
+                <IonLabel position="stacked">Last Name</IonLabel>
+                <IonInput
+                  name="lastName"
+                  value={formik.values.lastName}
+                  onIonChange={formik.handleChange}
+                />
+              </IonItem>
+              {formik.touched.lastName && formik.errors.lastName && (
+                <div className="error-message">{formik.errors.lastName}</div>
+              )}
+
+              <IonItem>
+                <IonLabel position="stacked">Email</IonLabel>
+                <IonInput
+                  type="email"
+                  name="email"
+                  value={formik.values.email}
+                  onIonChange={formik.handleChange}
+                />
+              </IonItem>
+              {formik.touched.email && formik.errors.email && (
+                <div className="error-message">{formik.errors.email}</div>
+              )}
+
+              <IonItem>
+                <IonLabel position="stacked">Password</IonLabel>
+                <IonInput
+                  type="password"
+                  name="password"
+                  value={formik.values.password}
+                  onIonChange={formik.handleChange}
+                />
+              </IonItem>
+              {formik.touched.password && formik.errors.password && (
+                <div className="error-message">{formik.errors.password}</div>
+              )}
+
+              <IonItem>
+                <IonLabel position="stacked">Phone Number</IonLabel>
+                <IonInput
+                  type="tel"
+                  name="phoneNumber"
+                  value={formik.values.phoneNumber}
+                  onIonChange={formik.handleChange}
+                />
+              </IonItem>
+              {formik.touched.phoneNumber && formik.errors.phoneNumber && (
+                <div className="error-message">{formik.errors.phoneNumber}</div>
+              )}
+
+              <IonItem>
+                <IonLabel position="stacked">State</IonLabel>
+                <IonInput
+                  name="state"
+                  value={formik.values.state}
+                  onIonChange={formik.handleChange}
+                />
+              </IonItem>
+              {formik.touched.state && formik.errors.state && (
+                <div className="error-message">{formik.errors.state}</div>
+              )}
+
+              <IonItem>
+                <IonLabel position="stacked">Medical Specialty</IonLabel>
+                <IonInput
+                  name="medicalSpecialty"
+                  value={formik.values.medicalSpecialty}
+                  onIonChange={formik.handleChange}
+                />
+              </IonItem>
+              {formik.touched.medicalSpecialty && formik.errors.medicalSpecialty && (
+                <div className="error-message">{formik.errors.medicalSpecialty}</div>
+              )}
+
+              <IonButton
+                expand="block"
+                type="submit"
+                className="ion-margin-top"
+              >
                 Register
               </IonButton>
-            </form>
 
-            <IonText className="ion-text-center ion-margin-top">
-              <p>
-                Already have an account?{' '}
-                <IonButton fill="clear" routerLink="/login" className="ion-no-padding">
-                  Login here
-                </IonButton>
-              </p>
-            </IonText>
+              <div className="ion-text-center ion-padding-top">
+                <IonText>
+                  Already have an account?{' '}
+                  <IonButton fill="clear" routerLink="/login" className="ion-no-padding">
+                    Login here
+                  </IonButton>
+                </IonText>
+              </div>
+            </form>
           </IonCardContent>
         </IonCard>
+
+        <IonToast
+          isOpen={showToast}
+          onDidDismiss={() => setShowToast(false)}
+          message={toastMessage}
+          duration={2000}
+          color={toastColor}
+          position="top"
+        />
       </IonContent>
     </IonPage>
   );
 };
 
-export default RegisterPage;
+export default DoctorRegisterPage;

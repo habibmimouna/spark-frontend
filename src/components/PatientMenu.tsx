@@ -27,7 +27,7 @@ const PatientMenu: React.FC = () => {
 
   const handleLogout = () => {
     AuthService.logout();
-    history.push('/login');
+    window.location.href = '/login';
   };
 
   return (

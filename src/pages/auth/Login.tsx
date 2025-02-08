@@ -82,7 +82,7 @@ const LoginPage: React.FC = () => {
 
             <form onSubmit={formik.handleSubmit}>
               <IonItem>
-                <IonLabel position="floating">Email</IonLabel>
+                <IonLabel position="stacked">Email</IonLabel>
                 <IonInput
                   type="email"
                   name="email"
@@ -95,7 +95,7 @@ const LoginPage: React.FC = () => {
               )}
 
               <IonItem>
-                <IonLabel position="floating">Password</IonLabel>
+                <IonLabel position="stacked">Password</IonLabel>
                 <IonInput
                   type="password"
                   name="password"
