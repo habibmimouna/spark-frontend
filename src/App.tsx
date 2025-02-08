@@ -27,8 +27,10 @@ import PatientDashboard from './pages/patient/Dashboard';
 import DoctorAppointments from './pages/doctor/Appointments';
 import PatientAppointments from './pages/patient/Appointments';
 import PatientProfile from './pages/patient/Profile';
-// import ResetPassword from './pages/auth/ResetPassword';
+import AuthenticatedLayout from './layouts/AuthenticatedLayout';
 import ProtectedRoute from './components/ProtectedRoute';
+import DoctorPatients from './pages/doctor/Patients';
+import ResetPassword from './pages/auth/ResetPassword'
 
 setupIonicReact();
 
@@ -37,16 +39,71 @@ const App: React.FC = () => (
     <IonReactRouter>
       <IonRouterOutlet>
         <Route exact path="/login" component={LoginPage} />
-        {/* <Route exact path="/reset-password" component={ResetPassword} /> */}
+        <Route exact path="/reset-password" component={ResetPassword} />
         
         {/* Doctor Routes */}
-        <ProtectedRoute exact path="/doctor/dashboard" component={DoctorDashboard} userType="doctor" />
-        <ProtectedRoute exact path="/doctor/appointments" component={DoctorAppointments} userType="doctor" />
+        <ProtectedRoute 
+          exact 
+          path="/doctor/dashboard" 
+          userType="doctor"
+          component={(props: any) => (
+            <AuthenticatedLayout>
+              <DoctorDashboard {...props} />
+            </AuthenticatedLayout>
+          )} 
+        />
+        <ProtectedRoute 
+          exact 
+          path="/doctor/appointments" 
+          userType="doctor"
+          component={(props: any) => (
+            <AuthenticatedLayout>
+              <DoctorAppointments {...props} />
+            </AuthenticatedLayout>
+          )} 
+        />
+        <ProtectedRoute 
+          exact 
+          path="/doctor/patients" 
+          userType="doctor"
+          component={(props: any) => (
+            <AuthenticatedLayout>
+              <DoctorPatients {...props} />
+            </AuthenticatedLayout>
+          )} 
+        />
         
         {/* Patient Routes */}
-        <ProtectedRoute exact path="/patient/dashboard" component={PatientDashboard} userType="patient" />
-        <ProtectedRoute exact path="/patient/appointments" component={PatientAppointments} userType="patient" />
-        <ProtectedRoute exact path="/patient/profile" component={PatientProfile} userType="patient" />
+        <ProtectedRoute 
+          exact 
+          path="/patient/dashboard" 
+          userType="patient"
+          component={(props: any) => (
+            <AuthenticatedLayout>
+              <PatientDashboard {...props} />
+            </AuthenticatedLayout>
+          )} 
+        />
+        <ProtectedRoute 
+          exact 
+          path="/patient/appointments" 
+          userType="patient"
+          component={(props: any) => (
+            <AuthenticatedLayout>
+              <PatientAppointments {...props} />
+            </AuthenticatedLayout>
+          )} 
+        />
+        <ProtectedRoute 
+          exact 
+          path="/patient/profile" 
+          userType="patient"
+          component={(props: any) => (
+            <AuthenticatedLayout>
+              <PatientProfile {...props} />
+            </AuthenticatedLayout>
+          )} 
+        />
         
         <Route exact path="/">
           <Redirect to="/login" />
@@ -55,5 +112,4 @@ const App: React.FC = () => (
     </IonReactRouter>
   </IonApp>
 );
-
-export default App;
+export default App
