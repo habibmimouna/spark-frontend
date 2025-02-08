@@ -1,4 +1,3 @@
-// src/pages/patient/Profile.tsx
 import React, { useState, useEffect } from 'react';
 import {
     IonContent,
@@ -64,7 +63,12 @@ const PatientProfile: React.FC = () => {
         validationSchema,
         onSubmit: async (values) => {
             try {
-                const response = await api.put(`/patient/${values._id}`, values);
+                let currentUser = localStorage.getItem('user')
+                let parseduser;
+                if (currentUser) {
+                    parseduser = JSON.parse(currentUser)
+                }
+                const response = await api.put(`/patient/${parseduser.id}`, values);
                 setToastMessage('Profile updated successfully');
                 setShowToast(true);
             } catch (error) {
@@ -81,7 +85,12 @@ const PatientProfile: React.FC = () => {
 
     const fetchProfile = async () => {
         try {
-            const response = await api.get('/patient/profile');
+            let currentUser = localStorage.getItem('user')
+            let parseduser;
+            if (currentUser) {
+                parseduser = JSON.parse(currentUser)
+            }
+            const response = await api.get(`/patient/${parseduser.id}`);
             formik.setValues(response.data);
             setLoading(false);
         } catch (error) {
@@ -109,7 +118,7 @@ const PatientProfile: React.FC = () => {
                     <IonCard>
                         <IonCardContent>
                             <IonItem>
-                                <IonLabel position="floating">First Name</IonLabel>
+                                <IonLabel position="stacked" color="medium">First Name</IonLabel>
                                 <IonInput
                                     name="firstName"
                                     value={formik.values.firstName}
@@ -123,7 +132,7 @@ const PatientProfile: React.FC = () => {
                             )}
 
                             <IonItem>
-                                <IonLabel position="floating">Last Name</IonLabel>
+                                <IonLabel position="stacked" color="medium">Last Name</IonLabel>
                                 <IonInput
                                     name="lastName"
                                     value={formik.values.lastName}
@@ -132,7 +141,7 @@ const PatientProfile: React.FC = () => {
                             </IonItem>
 
                             <IonItem>
-                                <IonLabel position="floating">Email</IonLabel>
+                                <IonLabel position="stacked" color="medium">Email</IonLabel>
                                 <IonInput
                                     name="email"
                                     type="email"
@@ -142,7 +151,7 @@ const PatientProfile: React.FC = () => {
                             </IonItem>
 
                             <IonItem>
-                                <IonLabel position="floating">Phone Number</IonLabel>
+                                <IonLabel position="stacked" color="medium">Phone Number</IonLabel>
                                 <IonInput
                                     name="phoneNumber"
                                     type="tel"
@@ -152,7 +161,7 @@ const PatientProfile: React.FC = () => {
                             </IonItem>
 
                             <IonItem>
-                                <IonLabel position="floating">Address</IonLabel>
+                                <IonLabel position="stacked" color="medium">Address</IonLabel>
                                 <IonTextarea
                                     name="address"
                                     value={formik.values.address}
@@ -161,7 +170,7 @@ const PatientProfile: React.FC = () => {
                             </IonItem>
 
                             <IonItem>
-                                <IonLabel position="floating">Medical History</IonLabel>
+                                <IonLabel position="stacked" color="medium" >Medical History</IonLabel>
                                 <IonTextarea
                                     name="medicalHistory"
                                     value={formik.values.medicalHistory}

@@ -80,16 +80,13 @@ const PatientDashboard: React.FC = () => {
             duration: Yup.string().required('Required'),
             notes: Yup.string(),
         }),
-        onSubmit: async (values:any) => {
+        onSubmit: async (values: any) => {
             try {
-                console.log("ssss");
-                
                 let currentUser = localStorage.getItem('user')
                 let parseduser;
                 if (currentUser) {
                     parseduser = JSON.parse(currentUser)
                 }
-                console.log("ffff", parseduser);
                 await api.post('/appointments/book', { ...values, doctorId: parseduser.assignedDoctor });
                 setShowModal(false);
                 fetchAppointments();
@@ -115,7 +112,6 @@ const PatientDashboard: React.FC = () => {
             </IonHeader>
 
             <IonContent className="ion-padding">
-                {/* Upcoming Appointments */}
                 <IonCard>
                     <IonCardHeader>
                         <IonCardTitle>Upcoming Appointments</IonCardTitle>
@@ -152,14 +148,12 @@ const PatientDashboard: React.FC = () => {
                     </IonCardContent>
                 </IonCard>
 
-                {/* Book Appointment FAB */}
                 <IonFab vertical="bottom" horizontal="end" slot="fixed">
                     <IonFabButton onClick={() => setShowModal(true)}>
                         <IonIcon icon={add} />
                     </IonFabButton>
                 </IonFab>
 
-                {/* Book Appointment Modal */}
                 <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)}>
                     <IonHeader>
                         <IonToolbar>

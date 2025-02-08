@@ -1,3 +1,4 @@
+// src/pages/patient/Appointments.tsx
 import React, { useState, useEffect } from 'react';
 import {
     IonContent,
@@ -5,15 +6,10 @@ import {
     IonPage,
     IonTitle,
     IonToolbar,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonBadge,
     IonSegment,
     IonSegmentButton,
+    IonLabel,
     IonMenuButton,
-    IonCard,
-    IonCardContent,
     IonRefresher,
     IonRefresherContent,
     IonButton,
@@ -26,14 +22,16 @@ import {
     IonSelectOption,
     IonTextarea,
     IonToast,
+    IonItem,
+    IonButtons,
 } from '@ionic/react';
 import { RefresherEventDetail } from '@ionic/core';
 import { add } from 'ionicons/icons';
-import moment from 'moment';
-import api from '../../services/api';
-import PatientMenu from '../../components/PatientMenu';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import api from '../../services/api';
+import PatientMenu from '../../components/PatientMenu';
+import AppointmentCard from '../../components/AppointmentCard';
 
 interface Appointment {
     _id: string;
@@ -76,9 +74,6 @@ const PatientAppointments: React.FC = () => {
         event.detail.complete();
     };
 
-
-
-
     const formik = useFormik({
         initialValues: {
             time: new Date().toISOString(),
@@ -86,7 +81,6 @@ const PatientAppointments: React.FC = () => {
             duration: '30',
             notes: '',
             doctorId: '',
-
         },
         validationSchema: Yup.object({
             time: Yup.string().required('Required'),
@@ -97,15 +91,12 @@ const PatientAppointments: React.FC = () => {
         }),
         onSubmit: async (values) => {
             try {
-                console.log("ssss");
-                
                 let currentUser = localStorage.getItem('user')
                 let parseduser;
                 if (currentUser) {
                     parseduser = JSON.parse(currentUser)
                 }
-                console.log("ffff", parseduser);
-                await api.post('/appointments/book', { ...values, doctorId: parseduser });
+                await api.post('/appointments/book', { ...values, doctorId: parseduser.assignedDoctor });
                 setShowModal(false);
                 fetchAppointments();
                 setToastMessage('Appointment booked successfully');
@@ -119,35 +110,36 @@ const PatientAppointments: React.FC = () => {
         },
     });
 
-    const filteredAppointments = appointments.filter(apt => {
-        const appointmentDate = new Date(apt.time);
-        const now = new Date();
+    const filteredAppointments = appointments
+        .filter(apt => {
+            const appointmentDate = new Date(apt.time);
+            const now = new Date();
 
-        if (filter === 'upcoming') {
-            return appointmentDate >= now;
-        } else if (filter === 'past') {
-            return appointmentDate < now;
-        }
-        return true;
-    }).sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+            if (filter === 'upcoming') {
+                return appointmentDate >= now;
+            } else if (filter === 'past') {
+                return appointmentDate < now;
+            }
+            return true;
+        })
+        .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
 
     return (
         <IonPage>
             <PatientMenu />
             <IonHeader>
                 <IonToolbar>
-                    <IonMenuButton slot="start" />
+                    <IonButtons slot="start">
+                        <IonMenuButton />
+                    </IonButtons>
                     <IonTitle>My Appointments</IonTitle>
                 </IonToolbar>
-            </IonHeader>
-
-            <IonContent>
-                <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
-                    <IonRefresherContent></IonRefresherContent>
-                </IonRefresher>
-
-                <div className="ion-padding">
-                    <IonSegment value={filter} onIonChange={e => setFilter(e.detail.value as any)}>
+                <IonToolbar>
+                    <IonSegment 
+                        value={filter} 
+                        onIonChange={e => setFilter(e.detail.value as any)}
+                        style={{ padding: '0 8px' }}
+                    >
                         <IonSegmentButton value="all">
                             <IonLabel>All</IonLabel>
                         </IonSegmentButton>
@@ -158,30 +150,39 @@ const PatientAppointments: React.FC = () => {
                             <IonLabel>Past</IonLabel>
                         </IonSegmentButton>
                     </IonSegment>
+                </IonToolbar>
+            </IonHeader>
 
-                    <IonList>
-                        {filteredAppointments.map(appointment => (
-                            <IonCard key={appointment._id}>
-                                <IonCardContent>
-                                    <h2>Dr. {appointment.doctor.firstName} {appointment.doctor.lastName}</h2>
-                                    <p>{appointment.doctor.medicalSpecialty}</p>
-                                    <p>{moment(appointment.time).format('MMMM Do YYYY, h:mm a')}</p>
-                                    <p>Treatment: {appointment.treatment}</p>
-                                    <p>Duration: {appointment.duration} minutes</p>
-                                    {appointment.notes && <p>Notes: {appointment.notes}</p>}
+            <IonContent>
+                <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+                    <IonRefresherContent></IonRefresherContent>
+                </IonRefresher>
 
-                                    <div className="ion-text-right">
-                                        <IonBadge color={
-                                            appointment.status === 'Accepted' ? 'success' :
-                                                appointment.status === 'Pending' ? 'warning' : 'danger'
-                                        }>
-                                            {appointment.status}
-                                        </IonBadge>
-                                    </div>
-                                </IonCardContent>
-                            </IonCard>
-                        ))}
-                    </IonList>
+                <div style={{ 
+                    padding: '16px', 
+                    maxWidth: '800px', 
+                    margin: '0 auto',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px' 
+                }}>
+                    {filteredAppointments.length === 0 ? (
+                        <div style={{
+                            textAlign: 'center',
+                            padding: '32px',
+                            color: '#666'
+                        }}>
+                            No appointments found
+                        </div>
+                    ) : (
+                        filteredAppointments.map(appointment => (
+                            <AppointmentCard
+                                key={appointment._id}
+                                appointment={appointment}
+                                userType="patient"
+                            />
+                        ))
+                    )}
                 </div>
 
                 <IonFab vertical="bottom" horizontal="end" slot="fixed">
@@ -195,12 +196,11 @@ const PatientAppointments: React.FC = () => {
                     <IonHeader>
                         <IonToolbar>
                             <IonTitle>Book Appointment</IonTitle>
-                            <IonButton
-                                slot="end"
-                                onClick={() => setShowModal(false)}
-                            >
-                                Close
-                            </IonButton>
+                            <IonButtons slot="end">
+                                <IonButton onClick={() => setShowModal(false)}>
+                                    Close
+                                </IonButton>
+                            </IonButtons>
                         </IonToolbar>
                     </IonHeader>
                     <IonContent className="ion-padding">
@@ -252,13 +252,15 @@ const PatientAppointments: React.FC = () => {
                                 />
                             </IonItem>
 
-                            <IonButton
-                                expand="block"
-                                type="submit"
-                                className="ion-margin-top"
-                            >
-                                Book Appointment
-                            </IonButton>
+                            <div className="ion-padding">
+                                <IonButton
+                                    expand="block"
+                                    type="submit"
+                                    disabled={!formik.isValid || formik.isSubmitting}
+                                >
+                                    Book Appointment
+                                </IonButton>
+                            </div>
                         </form>
                     </IonContent>
                 </IonModal>
@@ -268,6 +270,9 @@ const PatientAppointments: React.FC = () => {
                     onDidDismiss={() => setShowToast(false)}
                     message={toastMessage}
                     duration={2000}
+                    position="top"
+                    color="dark"
+                    style={{ borderRadius: '8px' }}
                 />
             </IonContent>
         </IonPage>

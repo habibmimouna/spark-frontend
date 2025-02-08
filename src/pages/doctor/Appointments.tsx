@@ -1,3 +1,4 @@
+// src/pages/doctor/Appointments.tsx
 import React, { useState, useEffect } from 'react';
 import {
     IonContent,
@@ -5,26 +6,20 @@ import {
     IonPage,
     IonTitle,
     IonToolbar,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonBadge,
-    IonButton,
     IonSegment,
     IonSegmentButton,
+    IonLabel,
     IonMenuButton,
-    IonCard,
-    IonCardContent,
-    IonAlert,
     IonToast,
     IonSearchbar,
     IonRefresher,
     IonRefresherContent,
+    IonButtons,
 } from '@ionic/react';
 import { RefresherEventDetail } from '@ionic/core';
 import api from '../../services/api';
 import DoctorMenu from '../../components/DoctorMenu';
-import moment from 'moment';
+import AppointmentCard from '../../components/AppointmentCard';
 
 interface Appointment {
     _id: string;
@@ -44,8 +39,6 @@ const DoctorAppointments: React.FC = () => {
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [filter, setFilter] = useState<'all' | 'pending' | 'accepted' | 'rejected'>('all');
     const [searchText, setSearchText] = useState('');
-    const [showAlert, setShowAlert] = useState(false);
-    const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
 
@@ -97,24 +90,25 @@ const DoctorAppointments: React.FC = () => {
             <DoctorMenu />
             <IonHeader>
                 <IonToolbar>
-                    <IonMenuButton slot="start" />
+                    <IonButtons slot="start">
+                        <IonMenuButton />
+                    </IonButtons>
                     <IonTitle>Appointments</IonTitle>
                 </IonToolbar>
-            </IonHeader>
-
-            <IonContent>
-                <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
-                    <IonRefresherContent></IonRefresherContent>
-                </IonRefresher>
-
-                <div className="ion-padding">
+                <IonToolbar>
                     <IonSearchbar
                         value={searchText}
                         onIonChange={e => setSearchText(e.detail.value!)}
                         placeholder="Search patients..."
+                        style={{ padding: '0 8px' }}
                     />
-
-                    <IonSegment value={filter} onIonChange={e => setFilter(e.detail.value as any)}>
+                </IonToolbar>
+                <IonToolbar>
+                    <IonSegment 
+                        value={filter} 
+                        onIonChange={e => setFilter(e.detail.value as any)}
+                        style={{ padding: '0 8px' }}
+                    >
                         <IonSegmentButton value="all">
                             <IonLabel>All</IonLabel>
                         </IonSegmentButton>
@@ -128,52 +122,40 @@ const DoctorAppointments: React.FC = () => {
                             <IonLabel>Rejected</IonLabel>
                         </IonSegmentButton>
                     </IonSegment>
+                </IonToolbar>
+            </IonHeader>
 
-                    <IonList>
-                        {filteredAppointments.map(appointment => (
-                            <IonCard key={appointment._id}>
-                                <IonCardContent>
-                                    <h2 className="ion-no-margin">
-                                        {appointment.patient.firstName} {appointment.patient.lastName}
-                                    </h2>
-                                    <p className="ion-no-margin">
-                                        {moment(appointment.time).format('MMMM Do YYYY, h:mm a')}
-                                    </p>
-                                    <p>Treatment: {appointment.treatment}</p>
-                                    <p>Duration: {appointment.duration}</p>
-                                    <p>Phone: {appointment.patient.phoneNumber}</p>
+            <IonContent>
+                <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+                    <IonRefresherContent></IonRefresherContent>
+                </IonRefresher>
 
-                                    <div className="ion-text-right">
-                                        <IonBadge color={
-                                            appointment.status === 'Accepted' ? 'success' :
-                                                appointment.status === 'Pending' ? 'warning' : 'danger'
-                                        }>
-                                            {appointment.status}
-                                        </IonBadge>
-                                    </div>
-
-                                    {appointment.status === 'Pending' && (
-                                        <div className="ion-text-right ion-margin-top">
-                                            <IonButton
-                                                color="success"
-                                                size="small"
-                                                onClick={() => handleStatusUpdate(appointment._id, 'Accepted')}
-                                            >
-                                                Accept
-                                            </IonButton>
-                                            <IonButton
-                                                color="danger"
-                                                size="small"
-                                                onClick={() => handleStatusUpdate(appointment._id, 'Rejected')}
-                                            >
-                                                Reject
-                                            </IonButton>
-                                        </div>
-                                    )}
-                                </IonCardContent>
-                            </IonCard>
-                        ))}
-                    </IonList>
+                <div style={{ 
+                    padding: '16px', 
+                    maxWidth: '800px', 
+                    margin: '0 auto',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px' 
+                }}>
+                    {filteredAppointments.length === 0 ? (
+                        <div style={{
+                            textAlign: 'center',
+                            padding: '32px',
+                            color: '#666'
+                        }}>
+                            No appointments found
+                        </div>
+                    ) : (
+                        filteredAppointments.map(appointment => (
+                            <AppointmentCard
+                                key={appointment._id}
+                                appointment={appointment}
+                                userType="doctor"
+                                onStatusUpdate={handleStatusUpdate}
+                            />
+                        ))
+                    )}
                 </div>
 
                 <IonToast
@@ -181,6 +163,9 @@ const DoctorAppointments: React.FC = () => {
                     onDidDismiss={() => setShowToast(false)}
                     message={toastMessage}
                     duration={2000}
+                    position="top"
+                    color="dark"
+                    style={{ borderRadius: '8px' }}
                 />
             </IonContent>
         </IonPage>
