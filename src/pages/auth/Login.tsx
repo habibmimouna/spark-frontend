@@ -1,4 +1,3 @@
-// src/pages/auth/Login.tsx
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
@@ -16,6 +15,7 @@ import {
   IonToast,
   IonCard,
   IonCardContent,
+  IonText,
 } from '@ionic/react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -118,6 +118,20 @@ const LoginPage: React.FC = () => {
                 Forgot Password?
               </IonButton>
             </form>
+
+            {/* Add a link to the registration page */}
+            <IonText className="ion-text-center ion-margin-top">
+              <p>
+                Don't have an account?{' '}
+                <IonButton 
+                  fill="clear" 
+                  routerLink="/register" 
+                  className="ion-no-padding"
+                >
+                  Register here
+                </IonButton>
+              </p>
+            </IonText>
           </IonCardContent>
         </IonCard>
 

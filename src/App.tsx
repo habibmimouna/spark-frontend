@@ -31,6 +31,7 @@ import AuthenticatedLayout from './layouts/AuthenticatedLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import DoctorPatients from './pages/doctor/Patients';
 import ResetPassword from './pages/auth/ResetPassword'
+import RegisterPage from './pages/auth/Register';
 
 setupIonicReact();
 
@@ -108,6 +109,9 @@ const App: React.FC = () => (
         <Route exact path="/">
           <Redirect to="/login" />
         </Route>
+
+        <Route path="/register" component={RegisterPage} />
+
       </IonRouterOutlet>
     </IonReactRouter>
   </IonApp>
