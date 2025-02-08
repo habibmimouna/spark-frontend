@@ -46,6 +46,7 @@ const LoginPage: React.FC = () => {
           history.push('/doctor/dashboard');
         } else {
           const response = await AuthService.patientLogin(values);
+          
           localStorage.setItem('userType', 'patient');
           history.push('/patient/dashboard');
         }

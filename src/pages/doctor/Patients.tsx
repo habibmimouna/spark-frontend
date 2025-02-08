@@ -32,7 +32,7 @@ import { Patient } from '../../types';
 import moment from 'moment';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
-import {User} from '../../types/index'
+import { User } from '../../types/index'
 
 
 // interface User {
@@ -54,23 +54,23 @@ const DoctorPatients: React.FC = () => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [sortBy, setSortBy] = useState<'name' | 'recent'>('name');
-    const [doctor,setDoctor]=useState<User>()
+    const [doctor, setDoctor] = useState<User>()
 
     useEffect(() => {
-        
+
         const userString = localStorage.getItem('user');
         if (userString) {
             const userObject = JSON.parse(userString);
-          
+
             console.log(userObject);
             setDoctor(userObject)
-            console.log("ddd",doctor?.id);
-            
-          } else {
-            console.log('No user data found in localStorage');
-          }
+            console.log("ddd", doctor?.id);
 
-        
+        } else {
+            console.log('No user data found in localStorage');
+        }
+
+
         fetchPatients();
     }, []);
 
@@ -86,7 +86,6 @@ const DoctorPatients: React.FC = () => {
         assignedDoctor: Yup.string()
     });
 
-    // Formik setup for creating a new patient
     const createPatientForm = useFormik({
         initialValues: {
             firstName: '',
@@ -97,14 +96,14 @@ const DoctorPatients: React.FC = () => {
             phoneNumber: '',
             address: '',
             medicalHistory: '',
-            assignedDoctor:doctor?.id,
+            assignedDoctor: doctor?.id,
         },
         validationSchema,
         onSubmit: async (values) => {
             try {
-                console.log("vvv",values,doctor);
-                
-                await api.post('/patient', {...values,assignedDoctor:doctor?.id});
+                console.log("vvv", values, doctor);
+
+                await api.post('/patient', { ...values, assignedDoctor: doctor?.id });
                 setToastMessage('Patient created successfully');
                 setShowToast(true);
                 setShowCreateModal(false);
@@ -120,7 +119,7 @@ const DoctorPatients: React.FC = () => {
 
     const fetchPatients = async () => {
         try {
-            
+
             const response = await api.get('/patient');
             setPatients(response.data);
         } catch (error) {
@@ -164,8 +163,8 @@ const DoctorPatients: React.FC = () => {
             if (sortBy === 'name') {
                 return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
             } else {
-                // Sort by most recent appointment
-                return 0; // You would need to implement this based on your data structure
+
+                return 0;
             }
         });
 
@@ -181,7 +180,6 @@ const DoctorPatients: React.FC = () => {
             </IonHeader>
 
             <IonContent className="ion-padding">
-                {/* Keep existing content until the list */}
 
                 <IonList>
                     {filteredPatients.map(patient => (
@@ -209,16 +207,13 @@ const DoctorPatients: React.FC = () => {
                     ))}
                 </IonList>
 
-                {/* Create Patient FAB */}
+
                 <IonFab vertical="bottom" horizontal="end" slot="fixed">
                     <IonFabButton onClick={() => setShowCreateModal(true)}>
                         <IonIcon icon={add} />
                     </IonFabButton>
                 </IonFab>
 
-                {/* Keep existing Patient Details Modal */}
-
-                {/* Create Patient Modal */}
                 <IonModal isOpen={showCreateModal} onDidDismiss={() => setShowCreateModal(false)}>
                     <IonHeader>
                         <IonToolbar>

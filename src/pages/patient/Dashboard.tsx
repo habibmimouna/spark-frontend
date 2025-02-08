@@ -82,7 +82,15 @@ const PatientDashboard: React.FC = () => {
         }),
         onSubmit: async (values:any) => {
             try {
-                await api.post('/appointments/book', values);
+                console.log("ssss");
+                
+                let currentUser = localStorage.getItem('user')
+                let parseduser;
+                if (currentUser) {
+                    parseduser = JSON.parse(currentUser)
+                }
+                console.log("ffff", parseduser);
+                await api.post('/appointments/book', { ...values, doctorId: parseduser.assignedDoctor });
                 setShowModal(false);
                 fetchAppointments();
                 setToastMessage('Appointment booked successfully');

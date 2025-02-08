@@ -1,4 +1,3 @@
-// src/pages/doctor/Dashboard.tsx
 import React, { useEffect, useState } from 'react';
 import {
     IonContent,
@@ -81,7 +80,7 @@ const DoctorDashboard: React.FC = () => {
             </IonHeader>
 
             <IonContent className="ion-padding">
-                {/* Stats Cards */}
+
                 <div className="ion-grid">
                     <IonCard>
                         <IonCardContent className="ion-text-center">
@@ -108,7 +107,6 @@ const DoctorDashboard: React.FC = () => {
                     </IonCard>
                 </div>
 
-                {/* Recent Appointments */}
                 <IonCard>
                     <IonCardHeader>
                         <IonCardTitle>Recent Appointments</IonCardTitle>

@@ -1,4 +1,3 @@
-// src/pages/patient/Appointments.tsx
 import React, { useState, useEffect } from 'react';
 import {
     IonContent,
@@ -77,22 +76,36 @@ const PatientAppointments: React.FC = () => {
         event.detail.complete();
     };
 
+
+
+
     const formik = useFormik({
         initialValues: {
             time: new Date().toISOString(),
             treatment: '',
             duration: '30',
             notes: '',
+            doctorId: '',
+
         },
         validationSchema: Yup.object({
             time: Yup.string().required('Required'),
             treatment: Yup.string().required('Required'),
             duration: Yup.string().required('Required'),
             notes: Yup.string(),
+            doctorId: Yup.string(),
         }),
         onSubmit: async (values) => {
             try {
-                await api.post('/appointments/book', values);
+                console.log("ssss");
+                
+                let currentUser = localStorage.getItem('user')
+                let parseduser;
+                if (currentUser) {
+                    parseduser = JSON.parse(currentUser)
+                }
+                console.log("ffff", parseduser);
+                await api.post('/appointments/book', { ...values, doctorId: parseduser });
                 setShowModal(false);
                 fetchAppointments();
                 setToastMessage('Appointment booked successfully');
